@@ -27,11 +27,8 @@ app.post('/owner', (req, res) => {
         if (typeof(req.body[element]) === "string")
         req.body[element] = req.body[element].toLowerCase() ;
     }
-
-    console.log(req.body);
    
     const { nom, prenom, email, hotel, description, adresse, pays, region, nc, cs, cd, ct } = req.body;
-    console.log(nom, hotel, ct);
 
     db('hotels').insert({
         nom: nom,
