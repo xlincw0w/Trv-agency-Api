@@ -24,10 +24,14 @@ app.get('/', (req, res) => {
 
 app.post('/owner', (req, res) => {
     for (element in req.body) {
+        if (typeof(req.body[element]) === "string")
         req.body[element] = req.body[element].toLowerCase() ;
     }
+
+    console.log(req.body);
    
     const { nom, prenom, email, hotel, description, adresse, pays, region, nc, cs, cd, ct } = req.body;
+    console.log(nom, hotel, ct);
 
     db('hotels').insert({
         nom: nom,
