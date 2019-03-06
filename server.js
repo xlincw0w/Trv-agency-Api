@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const knex = require('knex');
 const cors = require('cors');
+const port = process.env.PORT || 3010;
 
 const db = knex({
     client: 'pg',
@@ -59,6 +60,6 @@ app.post('/search', (req, res) => {
     }).catch(err => res.status(400).send('Error Searching through database'));
 })
 
-app.listen(3010, () => {
+app.listen(port, () => {
     console.log('Server running');
 })
