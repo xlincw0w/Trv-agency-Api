@@ -52,7 +52,7 @@ app.post('/owner', (req, res) => {
 app.post('/search', (req, res) => {
     let { destination } = req.body;
     destination = destination.toLowerCase(); 
-    db.select('*').from('hotels').orderBy('prixsimple', 'desc').where({
+    db.select('*').from('hotels').orderBy('prixsimple').where({
         pays: destination
     }).orWhere({
         region: destination
