@@ -1,1 +1,2 @@
 CREATE TABLE hotels (id SERIAL PRIMARY KEY, nom varchar(100), prenom varchar(100), email varchar(100), hotel varchar(100) UNIQUE, description text, adresse text, pays varchar(100), region varchar(100), n_chambre varchar(100), prixsimple varchar(50), prixdouble varchar(50), prixtriple varchar(50) );
+CREATE TABLE reservation(id_res SERIAL PRIMARY KEY, id_hotel integer REFERENCES hotels (id), nom_cli varchar(100), prenom_cli varchar(100), email_cli varchar(100), date_debut DATE, date_fin DATE, type_chambre varchar(100) );

@@ -46,7 +46,6 @@ app.post('/owner', (req, res) => {
     }).then(console.log)
     .catch(err => res.status(400).send('Error Connecting to database'));
     res.json("Insertion to database done");
-
 })
 
 app.post('/search', (req, res) => {
@@ -59,6 +58,28 @@ app.post('/search', (req, res) => {
     }).then(data => {
         res.json(data);
     }).catch(err => res.status(400).send('Error Searching through database'));
+})
+
+app.post('/reservation', (req, res) => {
+    for (element in req.body) {
+        if (typeof(req.body[element]) === "string")
+        req.body[element] = req.body[element].toLowerCase() ;
+    }
+
+    const { id_hotel, nom_cli, prenom_cli, email_cli, date_debut, date_fin, type_chambre } = req.body;
+
+    db('reservation').insert({
+        id_hotel:id_hotel,
+        nom_cli: nom_cli, 
+        prenom_cli: prenom_cli,
+        email_cli: email_cli,
+        date_debut: date_debut,
+        date_fin: date_fin,
+        type_chambre: type_chambre,
+    }).then(console.log)
+    .catch(err => res.status(400).send('Error Connecting to database'));
+    res.json("Insertion to database done");
+
 })
 
 app.listen(port, () => {
