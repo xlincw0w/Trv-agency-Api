@@ -2,7 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const knex = require('knex');
 const cors = require('cors');
+const crypto = require('crypto-js');
 const port = process.env.PORT || 3010;
+
+var secretAESkey = 'secretkey';
 
 const db = knex({
     client: 'pg',
@@ -31,6 +34,7 @@ app.post('/owner', (req, res) => {
     const { nom, prenom, email, hotel, description, adresse, pays, region, nc, cs, cd, ct } = req.body;
 
     db('hotels').insert({
+        confirmed: false,
         nom: nom,
         prenom: prenom,
         email: email,
@@ -80,6 +84,48 @@ app.post('/reservation', (req, res) => {
     .catch(err => res.status(400).send('Error Connecting to database'));
     res.json("Insertion to database done");
 
+})
+
+app.post('/admin', (req, res) => {
+
+    const { username, aesEncryptedPassword } = req.body;
+
+    db('admin').select('*').where({
+        username: username,
+    }).then(data => row(data))
+    .catch(err => res.json({connected: false}));
+
+    const row = (data) => {
+
+    let bytes = crypto.AES.decrypt(aesEncryptedPassword, secretAESkey);
+    let password = bytes.toString(crypto.enc.Utf8);
+    hashed_password = crypto.SHA256(password).toString();
+    
+    if (hashed_password == data[0].hashed_password) res.json({connected: true});
+    else res.json({connected: false})
+    }
+})
+
+app.get('/unconfirmed', (req, res) => {
+    db('hotels').select('*').where({
+        confirmed: false
+    }).then(data => res.json(data))
+    .catch(err => res.status(400).send('erreur'));
+})
+
+app.post('/confirm', (req, res) => {
+    const { id, confirmed } = req.body;
+
+    if (confirmed) {
+        console.log(id);
+        db('hotels')
+        .where({ id: id })
+        .update({
+          confirmed: true,
+        })
+    } else {
+        console.log(id)
+    }
 })
 
 app.listen(port, () => {
