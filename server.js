@@ -7,6 +7,22 @@ const cors = require('cors');
 const crypto = require('crypto-js');
 const port = process.env.PORT || 3010;
 
+// Différente expressions reguliéres
+const nom_rg = /^[A-Za-z]+$/;
+const prenom_rg = /^[A-Za-z ]+$/;
+const email_rg = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const hotel_rg = /^[A-Za-z0-9 ]+$/;
+const description_rg = /^[A-Za-z0-9',.!?éè ]+$/;
+const adresse_rg = /^[A-Za-z0-9 ]+$/;
+const pays_rg = /^[A-Za-z ]+$/;
+const region_rg = /^[A-Za-z ]+$/;
+const nc_rg = /^[0-9]+$/;
+const cs_rg = /^[0-9]+$/;
+const cd_rg = /^[0-9]+$/;
+const ct_rg = /^[0-9]+$/;
+
+const max_description_text_length = 150;
+
 // Clé secréte du ciffrement symétrique des données grace a l'algorithme AES
 var secretAESkey = 'secretkey';
 
@@ -38,27 +54,46 @@ app.post('/owner', (req, res) => {
         if (typeof(req.body[element]) === "string")
         req.body[element] = req.body[element].toLowerCase() ;
     }
+
+    let unresolved_data = false;
    
     const { nom, prenom, email, hotel, description, adresse, pays, region, nc, cs, cd, ct } = req.body;
 
+    // Test de validité de données
+    if(!nom_rg.test(nom)) { unresolved_data = true } 
+    else if(!prenom_rg.test(prenom)) { unresolved_data = true }
+    else if(!email_rg.test(email)) { unresolved_data = true }
+    else if(!hotel_rg.test(hotel)) { unresolved_data = true }
+    else if(description.length > max_description_text_length) { unresolved_data = true }
+    else if(!description_rg.test(description)) { unresolved_data = true }
+    else if(!adresse_rg.test(adresse)) { unresolved_data = true }
+    else if(!pays_rg.test(pays)) { unresolved_data = true }
+    else if(!region_rg.test(region)) { unresolved_data = true }
+    else if(!nc_rg.test(nc)) { unresolved_data = true }
+    else if(!cs_rg.test(cs)) { unresolved_data = true }
+    else if(!cd_rg.test(cd)) { unresolved_data = true }
+    else if(!ct_rg.test(ct)) { unresolved_data = true }
+
     // INSERT INTO hotels
-    db('hotels').insert({
-        confirmed: false,
-        nom: nom,
-        prenom: prenom,
-        email: email,
-        hotel: hotel,
-        description: description,
-        adresse: adresse,
-        pays: pays,
-        region: region,
-        n_chambre: nc,          
-        prixsimple: cs,
-        prixdouble: cd,
-        prixtriple: ct
-    }).then(console.log)
-    .catch(err => res.status(400).send('Error Connecting to database'));
-    res.json("Insertion to database done");
+    if (!unresolved_data){
+        db('hotels').insert({
+            confirmed: false,
+            nom: nom,
+            prenom: prenom,
+            email: email,
+            hotel: hotel,
+            description: description,
+            adresse: adresse,
+            pays: pays,
+            region: region,
+            n_chambre: nc,          
+            prixsimple: cs,
+            prixdouble: cd,
+            prixtriple: ct
+        }).then(console.log)
+        .catch(err => res.status(400).send('Error Connecting to database'));
+        res.json("Insertion to database done");
+    }
 })
 
 // Handler de type 'POST' au niveau '/search'
@@ -90,6 +125,12 @@ app.post('/reservation', (req, res) => {
     }
 
     const { id_hotel, nom_cli, prenom_cli, email_cli, date_debut, date_fin, type_chambre } = req.body;
+
+    let unresolved_data = false;
+
+    if(!nom_rg.test(nom_cli)) { unresolved_data = true } 
+    else if(!prenom_rg.test(prenom_cli)) { unresolved_data = true }
+    else if(!email_rg.test(email_cli)) { unresolved_data = true }
 
     // INSERT INTO reservation
     db('reservation').insert({
